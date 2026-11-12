@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Neptewne</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
+</head>
+<body>
+    <div class="container">
+
+        <div class="menu-hero">
+            <h1 class="menu-title">MBBS Quiz</h1>
+            <p class="menu-sub">Choose a subject and year to start practising.</p>
+            <div class="menu-stats" id="menu-stats"></div>
+        </div>
+
+        <div id="menu" class="subject-grid"></div>
+
+        <div class="site-footer" id="site-footer"></div>
+
+    </div>
+
+    <script src="quizzes.js"></script>
+    <script>
+        document.getElementById("site-footer").innerText = footerText();
+
+        // Group the quizzes by subject name
+        const groups = {};
+        quizList.forEach(q => (groups[q.subject] = groups[q.subject] || []).push(q));
+
+        // Subjects shown as cards, sorted by credit (highest first).
+        // A subject with hideCard: true is counted in the totals but gets no card.
+        // A subject name used in quizList but missing from "subjects" still shows up
+        // (with no credit), so a typo is easy to spot.
+        const known = subjects.filter(s => !s.hideCard).sort((a, b) => b.credit - a.credit);
+        const unknown = Object.keys(groups)
+            .filter(name => !subjects.some(s => s.name === name))
+            .map(name => ({ name: name, credit: 0, icon: "📘" }));
+        const allSubjects = known.concat(unknown);
+
+        const totalCredits = subjects.reduce((sum, s) => sum + s.credit, 0);
+        const maxCredit = Math.max(...known.map(s => s.credit));
+
+        document.getElementById("menu-stats").innerHTML =
+            `<span class="stat-chip">${subjects.length} subjects</span>` +
+            `<span class="stat-chip">${totalCredits.toFixed(1)} credits</span>` +
+            `<span class="stat-chip">${quizList.length} past papers</span>`;
+
+        // Build one card per subject
+        let html = "";
+        allSubjects.forEach(s => {
+            const papers = (groups[s.name] || []).sort((a, b) => b.year - a.year);   // newest year first
+            const hasPapers = papers.length > 0;
+            const creditText = s.credit > 0 ? s.credit.toFixed(1) + " credits" : "";
+            const weight = s.credit > 0 ? (s.credit / maxCredit) * 100 : 0;
+
+            const yearsHtml = hasPapers
+                ? papers.map(q => `<a class="year-chip" href="quiz.html?set=${q.id}">${q.year}</a>`).join("")
+                : `<span class="coming-soon">Coming soon</span>`;
+
+            html += `
+              <div class="subject-card${hasPapers ? "" : " is-empty"}">
+                <div class="subject-head">
+                  <div class="subject-icon">${s.icon}</div>
+                  <div class="subject-info">
+                    <div class="subject-name">${s.name}</div>
+                    <div class="subject-count">${papers.length} past paper${papers.length === 1 ? "" : "s"}</div>
+                  </div>
+                  ${creditText ? `<div class="credit-badge">${creditText}</div>` : ""}
+                </div>
+                <div class="weight-bar" title="Weight compared with the highest-credit subject"><i style="width:${weight}%"></i></div>
+                <div class="year-row">${yearsHtml}</div>
+              </div>`;
+        });
+        document.getElementById("menu").innerHTML = html;
+    </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- NAME | TAB's NAME -->
+    <title>NEPTAAN | Quiz</title>
+    <link id="favicon" rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
+   
+    <!-- DATA CONNECTION | THE STYLE FILE -->
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+    <div class="container">
+    <a class="back-link" href="index.html"> ← All quizzes</a>
+    
+    <div class="quiz-subject" id="quiz-subject"></div>
+
+    <div class="header">
+        <h2 id="page-title">Loading...</h2>
+        <span id="stats-tracker" class="stats-text">Question 0/0 | Score: 0</span>
+    </div>
+        
+        <div class="progress-bar-container">
+            <div id="progress-fill" class="progress-bar-fill"></div>
+        </div>
+        
+        <div id="question-map" class="question-map"></div>
+        
+        <div id="quiz-container"></div>
+        
+        <div class="nav-controls">
+            <button id="prev-btn" class="nav-btn" onclick="prevQuestion()">&#8592; Previous</button>
+            <button id="next-btn" class="nav-btn" onclick="nextQuestion()">Next &#8594;</button>
+
+        </div>
+
+        <!-- ADD THIS LINE? -->
+        <div class="site-footer" id="site-footer"></div>
+    </div>
+
+    <!-- DATA CONNECTION | JS SOURCE FILE -->
+    <script src="quizzes.js"></script>
+    <script src="app.js"></script>
+    <script>
+
+        document.getElementById("site-footer").innerText = footerText();
+        
+        // Read ?set=... from the address, find that quiz, and load its data file
+        const quizId = new URLSearchParams(location.search).get("set");
+        const chosenQuiz = quizList.find(q => q.id === quizId);
+
+        if (!chosenQuiz) {
+            document.getElementById("quiz-container").innerHTML =
+                'Quiz not found. <a href="index.html">Go back to the menu</a>';
+        } else {
+            document.title = chosenQuiz.title;
+                        const subjectInfo = subjects.find(s => s.name === chosenQuiz.subject);
+            if (subjectInfo) {
+                document.getElementById("quiz-subject").innerText =
+                    subjectInfo.icon + "  " + subjectInfo.name + " · " + subjectInfo.credit.toFixed(1) + " credits";
+            }
+            document.getElementById("page-title").innerText = chosenQuiz.title;
+
+            const dataScript = document.createElement("script");
+            dataScript.src = chosenQuiz.file;
+            dataScript.onload = startQuiz;   // run the quiz once the data is loaded
+            dataScript.onerror = () => {
+                document.getElementById("quiz-container").innerText = "Could not load " + chosenQuiz.file;
+            };
+            document.body.appendChild(dataScript);
+        }
+    </script>
+
+</body>
+
+</html>
