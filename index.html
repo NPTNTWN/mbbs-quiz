@@ -11,7 +11,7 @@
     <div class="container">
 
         <div class="menu-hero">
-            <h1 class="menu-title">MBBS Quiz</h1>
+            <h1 class="menu-title">9 Semester MCQs Quiz</h1>
             <p class="menu-sub">Choose a subject and year to start practising.</p>
             <div class="menu-stats" id="menu-stats"></div>
         </div>
@@ -47,6 +47,27 @@
             `<span class="stat-chip">${subjects.length} subjects</span>` +
             `<span class="stat-chip">${totalCredits.toFixed(1)} credits</span>` +
             `<span class="stat-chip">${quizList.length} past papers</span>`;
+        
+        // ---- helpers for the year pills ----
+        function fmt(sec) {
+            const m = Math.floor(sec / 60), s = sec % 60;
+            return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+        }
+
+        function getBest(id) {
+            try { return JSON.parse(localStorage.getItem("mbbsquiz:" + id)); }
+            catch (e) { return null; }
+        }
+
+        function yearChip(q) {
+            const inProgress = q.status === "progress";
+            const best = inProgress ? null : getBest(q.id);
+            const tag = inProgress ? `<span class="chip-tag">In progress</span>` : "";
+            const bestText = best
+                ? `<span class="chip-best">${best.score}/${best.of}${best.time != null ? " · " + fmt(best.time) : ""}</span>`
+                : "";
+            return `<a class="year-chip${inProgress ? " is-progress" : ""}" href="quiz.html?set=${q.id}">${q.year}${tag}${bestText}</a>`;
+        }
 
         // Build one card per subject
         let html = "";
@@ -57,7 +78,7 @@
             const weight = s.credit > 0 ? (s.credit / maxCredit) * 100 : 0;
 
             const yearsHtml = hasPapers
-                ? papers.map(q => `<a class="year-chip" href="quiz.html?set=${q.id}">${q.year}</a>`).join("")
+                ? papers.map(yearChip).join("")
                 : `<span class="coming-soon">Coming soon</span>`;
 
             html += `

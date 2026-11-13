@@ -1,55 +1,74 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- NAME | TAB's NAME -->
     <title>NEPTAAN | Quiz</title>
-    <link id="favicon" rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
-   
-    <!-- DATA CONNECTION | THE STYLE FILE -->
     <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
     <div class="container">
-    <a class="back-link" href="index.html"> ← All quizzes</a>
-    
-    <div class="quiz-subject" id="quiz-subject"></div>
 
-    <div class="header">
-        <h2 id="page-title">Loading...</h2>
-        <span id="stats-tracker" class="stats-text">Question 0/0 | Score: 0</span>
-    </div>
-        
+        <a class="back-link" href="index.html">← All quizzes</a>
+        <div class="quiz-subject" id="quiz-subject"></div>
+
+        <div class="header">
+            <h2 id="page-title">Loading...</h2>
+            <span id="stats-tracker" class="stats-text">Question 0/0 | Score: 0</span>
+        </div>
+
+        <!-- NEW: amber notice for papers that are not finished -->
+        <div class="progress-notice" id="progress-notice" style="display:none"></div>
+
+        <!-- TIMER block 1 of 2: delete this block if you did NOT add the timer -->
+        <div class="timer-row" id="timer-row" style="display:none">
+            <span id="timer-display" class="timer-display">⏱ 00:00</span>
+            <button id="pause-btn" class="pause-btn" onclick="pauseQuiz()">⏸ Pause</button>
+        </div>
+
         <div class="progress-bar-container">
             <div id="progress-fill" class="progress-bar-fill"></div>
         </div>
-        
+
         <div id="question-map" class="question-map"></div>
-        
+
         <div id="quiz-container"></div>
-        
+
         <div class="nav-controls">
             <button id="prev-btn" class="nav-btn" onclick="prevQuestion()">&#8592; Previous</button>
             <button id="next-btn" class="nav-btn" onclick="nextQuestion()">Next &#8594;</button>
-
         </div>
 
-        <!-- ADD THIS LINE? -->
         <div class="site-footer" id="site-footer"></div>
     </div>
 
-    <!-- DATA CONNECTION | JS SOURCE FILE -->
+    <!-- TIMER block 2 of 2: delete this block if you did NOT add the timer -->
+    <div class="pause-overlay" id="pause-overlay" onclick="resumeQuiz()">
+        <div class="pause-card">
+            <div class="pause-title">⏸ Paused</div>
+            <div class="pause-sub">The timer is stopped. Click anywhere to continue.</div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS: the order matters (list first, then the functions, then the page script) -->
     <script src="quizzes.js"></script>
     <script src="app.js"></script>
     <script>
-
         document.getElementById("site-footer").innerText = footerText();
-        
+
+        // Shows the amber notice if the paper is marked status: "progress" in quizzes.js
+        function showProgressNotice() {
+            if (chosenQuiz.status !== "progress") return;
+            const have = myQuestionBank.length;
+            const box = document.getElementById("progress-notice");
+            box.innerText = chosenQuiz.total
+                ? "⚠ This paper is still being added: " + have + " of " + chosenQuiz.total + " questions so far."
+                : "⚠ This paper is still being added: " + have + " questions so far, more coming.";
+            box.style.display = "block";
+        }
+
         // Read ?set=... from the address, find that quiz, and load its data file
         const quizId = new URLSearchParams(location.search).get("set");
         const chosenQuiz = quizList.find(q => q.id === quizId);
@@ -59,23 +78,25 @@
                 'Quiz not found. <a href="index.html">Go back to the menu</a>';
         } else {
             document.title = chosenQuiz.title;
-                        const subjectInfo = subjects.find(s => s.name === chosenQuiz.subject);
+            document.getElementById("page-title").innerText = chosenQuiz.title;
+
+            const subjectInfo = subjects.find(s => s.name === chosenQuiz.subject);
             if (subjectInfo) {
                 document.getElementById("quiz-subject").innerText =
                     subjectInfo.icon + "  " + subjectInfo.name + " · " + subjectInfo.credit.toFixed(1) + " credits";
             }
-            document.getElementById("page-title").innerText = chosenQuiz.title;
 
             const dataScript = document.createElement("script");
             dataScript.src = chosenQuiz.file;
-            dataScript.onload = startQuiz;   // run the quiz once the data is loaded
+            dataScript.onload = function () {
+                showProgressNotice();   // show the notice if needed
+                startQuiz();            // then start the quiz
+            };
             dataScript.onerror = () => {
                 document.getElementById("quiz-container").innerText = "Could not load " + chosenQuiz.file;
             };
             document.body.appendChild(dataScript);
         }
     </script>
-
 </body>
-
 </html>
