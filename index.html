@@ -97,5 +97,17 @@
         });
         document.getElementById("menu").innerHTML = html;
     </script>
+    
+    <script>
+          // Count visits only when the site is online (not when opened from a folder)
+          if (location.protocol === "https:") {
+            const gc = document.createElement("script");
+            gc.async = true;
+            gc.src = "https://gc.zgo.at/count.js";
+            gc.dataset.goatcounter = "https://mbbsquiz.goatcounter.com/count";
+            document.body.appendChild(gc);
+          }
+        </script>
+        
 </body>
 </html>
