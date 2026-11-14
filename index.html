@@ -46,7 +46,7 @@
         document.getElementById("menu-stats").innerHTML =
             `<span class="stat-chip">${subjects.length} subjects</span>` +
             `<span class="stat-chip">${totalCredits.toFixed(1)} credits</span>` +
-            `<span class="stat-chip">${quizList.length} past papers</span>`;
+            `<span class="stat-chip">${quizList.filter(q => q.status !== "soon").length} past paperss</span>`;
         
         // ---- helpers for the year pills ----
         function fmt(sec) {
@@ -60,6 +60,9 @@
         }
 
         function yearChip(q) {
+            if (q.status === "soon") {
+                return `<span class="year-chip is-soon">${q.year}<span class="chip-tag chip-soon">Coming soon</span></span>`;
+            }
             const inProgress = q.status === "progress";
             const best = inProgress ? null : getBest(q.id);
             const tag = inProgress ? `<span class="chip-tag">In progress</span>` : "";
@@ -72,28 +75,34 @@
         // Build one card per subject
         let html = "";
         allSubjects.forEach(s => {
-            const papers = (groups[s.name] || []).sort((a, b) => b.year - a.year);   // newest year first
-            const hasPapers = papers.length > 0;
+            const all = (groups[s.name] || []).sort((a, b) => b.year - a.year);   // newest first
+            const ready = all.filter(q => !q.status);
+            const progress = all.filter(q => q.status === "progress");
+            const soon = all.filter(q => q.status === "soon");
+            const count = ready.length + progress.length;
             const creditText = s.credit > 0 ? s.credit.toFixed(1) + " credits" : "";
             const weight = s.credit > 0 ? (s.credit / maxCredit) * 100 : 0;
 
-            const yearsHtml = hasPapers
-                ? papers.map(yearChip).join("")
-                : `<span class="coming-soon">Coming soon</span>`;
+            // One line per group: ready, in progress, coming soon
+            let yearsHtml = "";
+            [ready, progress, soon].forEach(group => {
+                if (group.length) yearsHtml += `<div class="year-row">${group.map(yearChip).join("")}</div>`;
+            });
+            if (!yearsHtml) yearsHtml = `<div class="year-row"><span class="coming-soon">Coming soon</span></div>`;
 
             html += `
-              <div class="subject-card${hasPapers ? "" : " is-empty"}">
+            <div class="subject-card${count === 0 ? " is-empty" : ""}">
                 <div class="subject-head">
-                  <div class="subject-icon">${s.icon}</div>
-                  <div class="subject-info">
+                <div class="subject-icon">${s.icon}</div>
+                <div class="subject-info">
                     <div class="subject-name">${s.name}</div>
-                    <div class="subject-count">${papers.length} past paper${papers.length === 1 ? "" : "s"}</div>
-                  </div>
-                  ${creditText ? `<div class="credit-badge">${creditText}</div>` : ""}
+                    <div class="subject-count">${count} past paper${count === 1 ? "" : "s"}</div>
+                </div>
+                ${creditText ? `<div class="credit-badge">${creditText}</div>` : ""}
                 </div>
                 <div class="weight-bar" title="Weight compared with the highest-credit subject"><i style="width:${weight}%"></i></div>
-                <div class="year-row">${yearsHtml}</div>
-              </div>`;
+                ${yearsHtml}
+            </div>`;
         });
         document.getElementById("menu").innerHTML = html;
     </script>

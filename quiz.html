@@ -73,7 +73,7 @@
         const quizId = new URLSearchParams(location.search).get("set");
         const chosenQuiz = quizList.find(q => q.id === quizId);
 
-        if (!chosenQuiz) {
+        if (!chosenQuiz || chosenQuiz.status === "soon") {
             document.getElementById("quiz-container").innerHTML =
                 'Quiz not found. <a href="index.html">Go back to the menu</a>';
         } else {
