@@ -46,7 +46,7 @@
         document.getElementById("menu-stats").innerHTML =
             `<span class="stat-chip">${subjects.length} subjects</span>` +
             `<span class="stat-chip">${totalCredits.toFixed(1)} credits</span>` +
-            `<span class="stat-chip">${quizList.filter(q => q.status !== "soon").length} past paperss</span>`;
+            `<span class="stat-chip">${quizList.filter(q => q.status !== "soon").length} past papers</span>`;
         
         // ---- helpers for the year pills ----
         function fmt(sec) {
@@ -61,15 +61,14 @@
 
         function yearChip(q) {
             if (q.status === "soon") {
-                return `<span class="year-chip is-soon">${q.year}<span class="chip-tag chip-soon">Coming soon</span></span>`;
+                return `<span class="year-chip is-soon">${q.year}</span>`;
             }
             const inProgress = q.status === "progress";
             const best = inProgress ? null : getBest(q.id);
-            const tag = inProgress ? `<span class="chip-tag">In progress</span>` : "";
             const bestText = best
                 ? `<span class="chip-best">${best.score}/${best.of}${best.time != null ? " · " + fmt(best.time) : ""}</span>`
                 : "";
-            return `<a class="year-chip${inProgress ? " is-progress" : ""}" href="quiz.html?set=${q.id}">${q.year}${tag}${bestText}</a>`;
+            return `<a class="year-chip${inProgress ? " is-progress" : ""}" href="quiz.html?set=${q.id}">${q.year}${bestText}</a>`;
         }
 
         // Build one card per subject
@@ -83,10 +82,16 @@
             const creditText = s.credit > 0 ? s.credit.toFixed(1) + " credits" : "";
             const weight = s.credit > 0 ? (s.credit / maxCredit) * 100 : 0;
 
-            // One line per group: ready, in progress, coming soon
+            // One compact line per group, with the label shown once
+            const rows = [
+                { list: ready,    label: "",            cls: "" },
+                { list: progress, label: "In progress", cls: "row-progress" },
+                { list: soon,     label: "Coming soon", cls: "row-soon" }
+            ];
             let yearsHtml = "";
-            [ready, progress, soon].forEach(group => {
-                if (group.length) yearsHtml += `<div class="year-row">${group.map(yearChip).join("")}</div>`;
+            rows.forEach(r => {
+                if (!r.list.length) return;
+                yearsHtml += `<div class="year-row ${r.cls}">${r.label ? `<span class="row-label">${r.label}</span>` : ""}${r.list.map(yearChip).join("")}</div>`;
             });
             if (!yearsHtml) yearsHtml = `<div class="year-row"><span class="coming-soon">Coming soon</span></div>`;
 
