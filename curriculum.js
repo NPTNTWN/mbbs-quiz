@@ -131,9 +131,12 @@ function renderCurriculum(container, courses) {
     const group = element('div', 'curriculum-selector curriculum-selector-' + field);
     group.setAttribute('role', 'group');
     group.setAttribute('aria-label', label);
+    group.append(element('span', 'curriculum-selector-label', label));
+    const buttons = element('div', 'curriculum-selector-buttons');
     for (const option of options) {
-      const button = element('button', 'curriculum-selector-button', label + ' ' + option);
+      const button = element('button', 'curriculum-selector-button', String(option));
       button.type = 'button';
+      button.setAttribute('aria-label', label + ' ' + option);
       button.addEventListener('click', () => {
         if (field === 'year') year = option;
         else semester = option;
@@ -141,8 +144,9 @@ function renderCurriculum(container, courses) {
         updateSelection();
       });
       selectorButtons.push({ button, field, option });
-      group.append(button);
+      buttons.append(button);
     }
+    group.append(buttons);
     return group;
   }
 
@@ -156,17 +160,26 @@ function renderCurriculum(container, courses) {
   const courseList = element('div', 'curriculum-course-list');
   const rotation = element('p', 'curriculum-rotation', 'Year 6: clinical rotations, no standard course list.');
 
+  function stat(value, label) {
+    const tile = element('div', 'curriculum-stat');
+    tile.append(
+      element('strong', 'curriculum-stat-value', String(value)),
+      element('span', 'curriculum-stat-label', label),
+    );
+    return tile;
+  }
+
   function updateSelection() {
     const model = getCurriculumViewModel(courses, year, semester);
+    const s = model.summary;
     for (const { button, field, option } of selectorButtons) {
       button.setAttribute('aria-pressed', String(model[field] === option));
     }
-    const s = model.summary;
     summary.replaceChildren(
-      element('span', 'curriculum-stat', model.courseCount + ' courses'),
-      element('span', 'curriculum-stat', 'This semester: ' + formatCredits(s.semesterCredits) + ' credits'),
-      element('span', 'curriculum-stat', 'This year: ' + formatCredits(s.yearCredits) + ' credits'),
-      element('span', 'curriculum-stat', 'Total so far: ' + formatCredits(s.cumulativeCredits) + ' credits'),
+      stat(model.courseCount, 'Courses'),
+      stat(formatCredits(s.semesterCredits), 'Semester credits'),
+      stat(formatCredits(s.yearCredits), 'Year credits'),
+      stat(formatCredits(s.cumulativeCredits), 'Total so far'),
     );
     updateCourses(model);
   }

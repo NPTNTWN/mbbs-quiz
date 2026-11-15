@@ -329,3 +329,18 @@ body {
 
 /* Cards keep their own height, so a finished subject doesn't show empty space */
 .subject-grid { align-items: start; }
+
+/* Roadmap: compact mobile-friendly selectors and stat tiles */
+.curriculum-section .curriculum-controls { display: grid; gap: 10px; }
+.curriculum-section .curriculum-selector { display: grid; grid-template-columns: 84px minmax(0, 1fr); align-items: center; gap: 10px; }
+.curriculum-section .curriculum-selector-label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted, #787774); }
+.curriculum-section .curriculum-selector-buttons { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 46px); gap: 6px; justify-content: start; }
+.curriculum-section .curriculum-selector-year .curriculum-selector-buttons { grid-auto-columns: minmax(0, 1fr); min-width: 0; }
+.curriculum-section .curriculum-selector-button { padding: 8px 0; text-align: center; }
+.curriculum-section .curriculum-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin: 16px 0 12px; }
+.curriculum-section .curriculum-stat { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; background: var(--card, #fff); border: 1px solid var(--line, #e9e9e7); border-radius: 12px; }
+.curriculum-section .curriculum-stat-value { font-size: 20px; line-height: 1.2; color: var(--text, #37352f); }
+.curriculum-section .curriculum-stat-label { font-size: 12px; font-weight: 500; color: var(--muted, #787774); }
+@media (max-width: 520px) {
+    .curriculum-section .curriculum-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

@@ -100,7 +100,17 @@
     </script>
 
 <script>
-  window.goatcounter = { path: function () { return location.pathname + location.search; } };
+  window.addEventListener("load", function () {
+    if (location.protocol !== "https:") return;
+    window.goatcounter = { path: function () { return location.pathname + location.search; } };
+    setTimeout(function () {
+      var gc = document.createElement("script");
+      gc.async = true;
+      gc.src = "https://gc.zgo.at/count.js";
+      gc.dataset.goatcounter = "https://mbbsquiz.goatcounter.com/count";
+      document.body.appendChild(gc);
+    }, 2000);
+  });
 </script>
 
 <script>
