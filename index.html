@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,13 +11,23 @@
 <body>
     <div class="container">
 
-        <div class="menu-hero">
-            <h1 class="menu-title">9 Semester MCQs Quiz</h1>
-            <p class="menu-sub">Choose a subject and year to start practising.</p>
-            <div class="menu-stats" id="menu-stats"></div>
+        <div class="home-tabs" role="tablist" aria-label="Homepage sections">
+            <button id="mcq-tab" class="home-tab" type="button" role="tab" aria-selected="true" aria-controls="mcq-panel">MCQ Quiz</button>
+            <button id="roadmap-tab" class="home-tab" type="button" role="tab" aria-selected="false" aria-controls="roadmap-panel" tabindex="-1">MBBS Roadmap</button>
         </div>
 
-        <div id="menu" class="subject-grid"></div>
+        <section id="mcq-panel" role="tabpanel" aria-labelledby="mcq-tab">
+            <div class="menu-hero">
+                <h1 class="menu-title">9 Semester MCQs Quiz</h1>
+                <p class="menu-sub">Choose a subject and year to start practising.</p>
+                <div class="menu-stats" id="menu-stats"></div>
+            </div>
+            <div id="menu" class="subject-grid"></div>
+        </section>
+
+        <section id="roadmap-panel" role="tabpanel" aria-labelledby="roadmap-tab" hidden>
+            <section id="curriculum" class="curriculum-section"></section>
+        </section>
 
         <div class="site-footer" id="site-footer"></div>
 
@@ -26,14 +37,9 @@
     <script>
         document.getElementById("site-footer").innerText = footerText();
 
-        // Group the quizzes by subject name
         const groups = {};
         quizList.forEach(q => (groups[q.subject] = groups[q.subject] || []).push(q));
 
-        // Subjects shown as cards, sorted by credit (highest first).
-        // A subject with hideCard: true is counted in the totals but gets no card.
-        // A subject name used in quizList but missing from "subjects" still shows up
-        // (with no credit), so a typo is easy to spot.
         const known = subjects.filter(s => !s.hideCard).sort((a, b) => b.credit - a.credit);
         const unknown = Object.keys(groups)
             .filter(name => !subjects.some(s => s.name === name))
@@ -47,8 +53,7 @@
             `<span class="stat-chip">${subjects.length} subjects</span>` +
             `<span class="stat-chip">${totalCredits.toFixed(1)} credits</span>` +
             `<span class="stat-chip">${quizList.filter(q => q.status !== "soon").length} past papers</span>`;
-        
-        // ---- helpers for the year pills ----
+
         function fmt(sec) {
             const m = Math.floor(sec / 60), s = sec % 60;
             return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
@@ -71,10 +76,9 @@
             return `<a class="year-chip${inProgress ? " is-progress" : ""}" href="quiz.html?set=${q.id}">${q.year}${bestText}</a>`;
         }
 
-        // Build one card per subject
         let html = "";
         allSubjects.forEach(s => {
-            const all = (groups[s.name] || []).sort((a, b) => b.year - a.year);   // newest first
+            const all = (groups[s.name] || []).sort((a, b) => b.year - a.year);
             const ready = all.filter(q => !q.status);
             const progress = all.filter(q => q.status === "progress");
             const soon = all.filter(q => q.status === "soon");
@@ -82,7 +86,6 @@
             const creditText = s.credit > 0 ? s.credit.toFixed(1) + " credits" : "";
             const weight = s.credit > 0 ? (s.credit / maxCredit) * 100 : 0;
 
-            // One compact line per group, with the label shown once
             const rows = [
                 { list: ready,    label: "",            cls: "" },
                 { list: progress, label: "In progress", cls: "row-progress" },
@@ -98,12 +101,12 @@
             html += `
             <div class="subject-card${count === 0 ? " is-empty" : ""}">
                 <div class="subject-head">
-                <div class="subject-icon">${s.icon}</div>
-                <div class="subject-info">
-                    <div class="subject-name">${s.name}</div>
-                    <div class="subject-count">${count} past paper${count === 1 ? "" : "s"}</div>
-                </div>
-                ${creditText ? `<div class="credit-badge">${creditText}</div>` : ""}
+                    <div class="subject-icon">${s.icon}</div>
+                    <div class="subject-info">
+                        <div class="subject-name">${s.name}</div>
+                        <div class="subject-count">${count} past paper${count === 1 ? "" : "s"}</div>
+                    </div>
+                    ${creditText ? `<div class="credit-badge">${creditText}</div>` : ""}
                 </div>
                 <div class="weight-bar" title="Weight compared with the highest-credit subject"><i style="width:${weight}%"></i></div>
                 ${yearsHtml}
@@ -111,17 +114,51 @@
         });
         document.getElementById("menu").innerHTML = html;
     </script>
-    
+
+    <script src="curriculum-data.js"></script>
+    <script src="curriculum.js"></script>
     <script>
-          // Count visits only when the site is online (not when opened from a folder)
-          if (location.protocol === "https:") {
-            const gc = document.createElement("script");
-            gc.async = true;
-            gc.src = "https://gc.zgo.at/count.js";
-            gc.dataset.goatcounter = "https://mbbsquiz.goatcounter.com/count";
-            document.body.appendChild(gc);
-          }
-        </script>
-        
+        initCurriculum();
+    </script>
+
+    <script>
+        const homeTabs = Array.from(document.querySelectorAll(".home-tab"));
+        const homePanels = homeTabs.map(tab => document.getElementById(tab.getAttribute("aria-controls")));
+
+        function selectHomeTab(index, focus) {
+            homeTabs.forEach((tab, tabIndex) => {
+                const selected = tabIndex === index;
+                tab.setAttribute("aria-selected", String(selected));
+                tab.tabIndex = selected ? 0 : -1;
+                homePanels[tabIndex].hidden = !selected;
+            });
+            if (focus) homeTabs[index].focus();
+        }
+
+        homeTabs.forEach((tab, index) => {
+            tab.addEventListener("click", () => selectHomeTab(index, false));
+            tab.addEventListener("keydown", event => {
+                const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
+                if (!keys.includes(event.key)) return;
+                event.preventDefault();
+                const nextIndex = event.key === "Home" ? 0 : event.key === "End" ? homeTabs.length - 1 : (index + (event.key === "ArrowRight" ? 1 : -1) + homeTabs.length) % homeTabs.length;
+                selectHomeTab(nextIndex, true);
+            });
+        });
+    </script>
+
+    <script>
+        window.addEventListener("load", function () {
+            if (location.protocol !== "https:") return;
+            setTimeout(function () {
+                var gc = document.createElement("script");
+                gc.async = true;
+                gc.src = "https://gc.zgo.at/count.js";
+                gc.dataset.goatcounter = "https://mbbsquiz.goatcounter.com/count";
+                document.body.appendChild(gc);
+            }, 2000);
+        });
+    </script>
+
 </body>
 </html>
