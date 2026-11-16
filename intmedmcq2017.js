@@ -442,4 +442,63 @@ const myQuestionBank = [
     // Source: Chronic Myeloid Leukemia lecture (5Y - Int Med (W))
     // Confidence: high
   },
+
+{
+  caseText:
+    "A 52-year-old male presents to the ER with sudden severe pain in the precordial area and profuse sweating for 20 hours. He has previous uncontrolled hypertension for more than 10 years with BP of 180/110 mmHg normally. The electrocardiogram is shown in the figure.",
+  images: ["images/intmedii2017_case28-30.png"],
+  question:
+    "28. The most significant change in electrocardiogram to distinguish myocardial infarction and angina pectoris is ( )",
+    
+  options: [
+    "A. T wave inversion",
+    "B. Coronary T wave",
+    "C. Pathological Q wave",
+    "D. ST segment depression",
+    "E. Increased heart rate",
+  ],
+  answerIndex: 2, // C
+  explanation:
+    "<b>Why:</b> A pathological Q wave indicates myocardial necrosis (irreversible myocardial cell death), supporting myocardial infarction rather than uncomplicated angina pectoris<br><b>Why not the others:</b> A and B indicate myocardial ischemia and may occur in both conditions; D is a typical ischemic change in angina; E is nonspecific and cannot distinguish the two<br><b>Key concept:</b> Angina causes transient myocardial ischemia without myocardial necrosis, whereas myocardial infarction causes irreversible myocardial injury and may produce pathological Q waves<br><b>High-yield:</b> Pathological Q wave = myocardial necrosis; ST depression or T-wave inversion = myocardial ischemia. However, Q waves may be absent in early MI",
+  // Source: ECG image and clinical question; no lecture slides supplied
+  // Confidence: high
+},
+{
+  caseText:
+    "A 52-year-old male presents to the ER with sudden severe pain in the precordial area and profuse sweating for 20 hours. He has previous uncontrolled hypertension for more than 10 years with BP of 180/110 mmHg normally. The electrocardiogram is shown in the figure.",
+  images: ["images/intmedii2017_case28-30.png"],
+  question:
+    "29. The most likely occluded coronary artery is ( )",
+  options: [
+    "A. Left circumflex branch",
+    "B. Anterior descending branch",
+    "C. Posterior descending branch",
+    "D. Left main stem",
+    "E. Right coronary artery",
+  ],
+  answerIndex: 1, // B
+  explanation:
+    "<b>Why:</b> The ECG shows marked ST-segment elevation in the anterior precordial leads, particularly V1–V4, indicating an acute anterior/anteroseptal STEMI. The most likely culprit vessel is the left anterior descending (LAD) artery<br><b>Why not the others:</b> A usually causes lateral or posterior MI; C and E commonly cause inferior MI; D may cause extensive ischemia involving multiple territories rather than an isolated anterior pattern<br><b>Key concept:</b> The LAD supplies the anterior wall of the left ventricle and anterior two-thirds of the interventricular septum. Its occlusion causes anterior or anteroseptal MI<br><b>High-yield:</b> LAD = V1–V4 (anterior/septal); LCx = I, aVL, V5–V6 (lateral); RCA = II, III, aVF (inferior)",
+  // Source: ECG image and clinical question; no lecture slides supplied
+  // Confidence: high
+},
+{
+  caseText:
+    "A 52-year-old male presents to the ER with sudden severe pain in the precordial area and profuse sweating for 20 hours. He has previous uncontrolled hypertension for more than 10 years with BP of 180/110 mmHg normally. The electrocardiogram is shown in the figure.",
+  images: ["images/intmedii2017_case28-30.png"],
+  question:
+    "30. Complications of acute myocardial infarction do NOT include ( )",
+  options: [
+    "A. Heart rupture",
+    "B. Infective endocarditis",
+    "C. Spleen embolism",
+    "D. Papillary muscle dysfunction",
+    "E. Ventricular aneurysm",
+  ],
+  answerIndex: 1, // B
+  explanation:
+    "<b>Why:</b> Infective endocarditis is an infection of the endocardial surface, usually involving heart valves. It is not a typical direct complication of acute myocardial infarction<br><b>Why not the others:</b> A is a mechanical complication that can cause cardiac tamponade; C can occur when a left ventricular mural thrombus causes systemic embolization; D can cause acute mitral regurgitation; E results from thinning and scar formation in the infarcted ventricular wall<br><b>Key concept:</b> Acute MI can cause mechanical complications (free-wall rupture, septal rupture, papillary muscle dysfunction), electrical complications (arrhythmias), and thromboembolic complications (mural thrombus and systemic embolism)<br><b>High-yield:</b> Remember the major mechanical complications of MI: free-wall rupture → cardiac tamponade; papillary muscle rupture → acute mitral regurgitation; septal rupture → ventricular septal defect; ventricular aneurysm → chronic scar-related complication",
+  // Source: Clinical question; no lecture slides supplied
+  // Confidence: high
+}
 ];
